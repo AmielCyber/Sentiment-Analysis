@@ -114,6 +114,18 @@ print('Maximum review length: ', max_length)
 print(X_train.shape)
 
 
+scores = cross_val_score(LogisticRegression(), X_train, y_train, cv=5)
+print("Mean cross-validation accuracy: {:.2f}".format(np.mean(scores)))
+
+print("-------------------------------------------------------------")
+param_grid = {'C': [0.001, 0.01, 0.1, 1, 10]}
+grid = GridSearchCV(LogisticRegression(), param_grid, cv=5)
+grid.fit(X_train, y_train)
+print("Best cross-validation score: {:.2f}".format(grid.best_score_))
+print("Best parameters: ", grid.best_params_)
+print("-------------------------------------------------------------")
+
+
 # In[ ]:
 
 
