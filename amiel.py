@@ -1,6 +1,10 @@
-from sklearn.model_selection import train_test_split
-import csv              # To read and split comma separated files or other delimiter
-import numpy as np      # To use numpy arrays
+from sklearn.model_selection import train_test_split            # To split our data
+import csv                                                  # To read and split comma separated files or other delimiter
+import numpy as np                                              # To use numpy arrays
+from sklearn.feature_extraction.text import CountVectorizer     # To create bag of words
+from sklearn.model_selection import cross_val_score             # To get a cross valid score
+from sklearn.linear_model import LogisticRegression             # To train our data
+
 
 def process_data():
     """ Process data for our data files.
@@ -8,7 +12,7 @@ def process_data():
     Process the data from our text files that contain reviews and the sentimental score for that review.
     Our text file contains the format: Review sentence \t sentimental score.
 
-    :return: An input list of reviews and an output np array of the sentimental value (0 or 1).
+    :return: An input list of reviews and an output of an np array of the sentimental value (0 or 1).
     """
     # take list of filepaths to get data
     filepaths = {'amazon': 'amazon_cells_labelled.txt',
@@ -28,13 +32,7 @@ def process_data():
                 input_list.append(line[0])
                 output_list.append(int(line[1]))
 
-    output_array = np.array(output_list)    # Make our output an np array to be compatible with sklearn functions
-
-    ###########################################BOOK STUFF#####################################
-    print('Number of documents in test data: {}'.format(len(input_list)))
-    print('Samples per class (training): {}'.format(np.bincount(output_list)))
-    print('end sentiment')
-    ##########################################################################################
+    output_array = np.array(output_list)  # Make our output an np array to be compatible with sklearn functions
 
     return input_list, output_array
 
@@ -53,10 +51,31 @@ def split_data(X, y):
     return X_train, X_test, y_train, y_test
 
 
+def get_bag_of_words(input_text_list):
+    """ get bag of words representation for data set of inputs (aka transforming the training data).
+        These will help us train our data set easier.
+
+    :param input_text_list: The input list that will like to have a bag-of-words representation.
+    :return:
+    """
+    vect = CountVectorizer().fit(input_text_list)  # Create an instance of CountVectorizer
+    transform_text_list = vect.transform(input_text_list)  # Transform the text list
+
+    return transform_text_list
+
+
 if __name__ == '__main__':
     # Process our data
     input_list, output_list = process_data()
     # Split our data
     X_train, X_test, y_train, y_test = split_data(input_list, output_list)
+    # Set our input data into bag of words for feature extraction
+
+    ################BOOK STUFF #######################################
+    transformed_X_train = get_bag_of_words(X_train)
+    scores = cross_val_score(LogisticRegression(), transformed_X_train, y_train, cv=5)
+    print('Mean cross-validation accuracy {:.2f}'.format(np.mean(scores)))
+
+    #################################################################
 
     print('hello')
