@@ -4,6 +4,8 @@ import numpy as np                                              # To use numpy a
 from sklearn.feature_extraction.text import CountVectorizer     # To create bag of words
 from sklearn.model_selection import cross_val_score             # To get a cross valid score
 from sklearn.linear_model import LogisticRegression             # To train our data
+from sklearn.model_selection import GridSearchCV
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 
 def process_data():
     """ Process data for our data files.
@@ -69,11 +71,56 @@ if __name__ == '__main__':
     # Split our data
     X_train, X_test, y_train, y_test = split_data(input_list, output_list)
     # Set our input data into bag of words for feature extraction
-
-    ################BOOK STUFF #######################################
     transformed_X_train = get_bag_of_words(X_train)
     scores = cross_val_score(LogisticRegression(), transformed_X_train, y_train, cv=5)
     print('Mean cross-validation accuracy {:.2f}'.format(np.mean(scores)))
+    ################BOOK STUFF #######################################
+    # In[12]
+    vect = CountVectorizer().fit(X_train)
+    X_train_transformed = vect.transform(X_train)
+    print('X_train:\n{}'.format(repr(X_train_transformed)))
+    # In[13]
+    feature_names = vect.get_feature_names()
+    print('Number of features: {}'.format(len(feature_names)))
+    print('First 20 features:\n{}'.format(feature_names[:20]))
+    print('Features 1000 to 1030:\n{}'.format((feature_names[1000:1030])))
+    print('Every 500th feature:\n{}'.format(feature_names[::500]))
+    # In[14]
+    param_grid = {'C': [0.001, 0.01, 0.1, 1, 10]}
+    grid = GridSearchCV(LogisticRegression(), param_grid, cv=5)
+    grid.fit(X_train_transformed, y_train)
+    print('Best cross-validation score: {:.2f}'.format(grid.best_score_))
+    print('Best parameters: ', grid.best_params_)
+    # In[16]
+    X_test_transformed = vect.transform(X_test)
+    print('Test score: {:.2f}'.format(grid.score(X_test_transformed, y_test)))
+    # In[17]
+    vect = CountVectorizer(min_df=5).fit(X_train)
+    X_train_transformed = vect.transform(X_train)
+    print('X_train with min_dif: {}'.format(repr(X_train_transformed)))
+    # In[18]
+    feature_names = vect.get_feature_names()
+    print('First 50 features:\n{}'.format(feature_names[:50]))
+    print('Features 900 to 1000:\n{}'.format(feature_names[900:1000]))
+    print('Every 70th feature:\n{}'.format(feature_names[::70]))
+    # In[19]
+    grid = GridSearchCV(LogisticRegression(), param_grid, cv=5)
+    grid.fit(X_train_transformed, y_train)
+    print('Best cross-validation score: {:.2f}'.format(grid.best_score_))
+    # In 20
+    print('Number of stop words: {}'.format(len(ENGLISH_STOP_WORDS)))
+    print('Every 10th stopword:\n{}'.format(list(ENGLISH_STOP_WORDS)[::10]))
+    # In[21]
+    vect = CountVectorizer(min_df=5, stop_words='english').fit(X_train)
+    X_train_transformed = vect.transform(X_train)
+    print('X_train with stop words:\n{}'.format(repr(X_train_transformed)))
+    # In[22]
+    grid = GridSearchCV(LogisticRegression(), param_grid, cv=5)
+    grid.fit(X_train_transformed, y_train)
+    print('Best cross-validation score: {:.2f}'.format(grid.best_score_))
+
+
+
 
     #################################################################
 
