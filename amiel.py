@@ -5,7 +5,6 @@ from sklearn.feature_extraction.text import CountVectorizer     # To create bag 
 from sklearn.model_selection import cross_val_score             # To get a cross valid score
 from sklearn.linear_model import LogisticRegression             # To train our data
 
-
 def process_data():
     """ Process data for our data files.
 
@@ -58,8 +57,8 @@ def get_bag_of_words(input_text_list):
     :param input_text_list: The input list that will like to have a bag-of-words representation.
     :return:
     """
-    vect = CountVectorizer().fit(input_text_list)  # Create an instance of CountVectorizer
-    transform_text_list = vect.transform(input_text_list)  # Transform the text list
+    vect = CountVectorizer().fit(input_text_list)       # Create an instance of CountVectorizer
+    transform_text_list = vect.transform(input_text_list)    # Transform the text list
 
     return transform_text_list
 
@@ -77,5 +76,6 @@ if __name__ == '__main__':
     print('Mean cross-validation accuracy {:.2f}'.format(np.mean(scores)))
 
     #################################################################
+
 
     print('hello')
